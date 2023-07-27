@@ -1,3 +1,4 @@
+import exp from 'constants';
 import prismaClient from '../../lib/prisma';
 import { type userParams } from './user';
 import { User } from '@prisma/client';
@@ -35,6 +36,12 @@ export async function getUserById( Id: string ) {
     }
 }
 
+export function registerUser(){
+    return 1 + 1 
+}
+
+
+// funciones de pepe
 export async function createUser( data: User ) {}
 
 export async function updateUser( Id: string, data: User ) {}
