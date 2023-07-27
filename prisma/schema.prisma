@@ -1,0 +1,59 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  Id      String      @id @default(uuid())
+  Name    String      @db.VarChar(50)
+  LastName String     @db.VarChar(50)
+  UserName String     @db.VarChar(50)
+  Email   String      @db.VarChar(70)
+  Password String     @db.VarChar(30)
+  Deleted Boolean     @default(false)
+  Role     Role       @default(USER)
+  Posts  Post[]
+
+  @@unique(fields:[Email, Deleted(false)], map: "Aviable_Email")
+  @@unique(fields:[UserName, Deleted(false)], map: "Aviable_UserName")
+}
+
+model Category {
+  Id      String      @id @default(uuid())
+  Name    String      @db.VarChar(50)
+  Deleted Boolean     @default(false)
+  Posts  CategoriesOnPosts[]
+}
+
+model Post {
+  Id      String        @id @default(uuid())
+  Tittle  String        @db.VarChar(300)
+  Content String        @db.VarChar(2000)
+  CreatedAt  DateTime   @default(now())
+  UpdatedAt  DateTime   @updatedAt
+  published  Boolean    @default(false)
+  Author     User       @relation(fields: [AuthorId], references: [Id])
+  AuthorId   String     @unique
+  Deleted    Boolean    @default(false)
+  Categories CategoriesOnPosts[]
+}
+
+model CategoriesOnPosts {
+  Post       Post     @relation(fields: [PostId], references: [Id])
+  PostId     String   
+  Category   Category @relation(fields: [CategoryId], references: [Id])
+  CategoryId String 
+  AssignedAt DateTime @default(now())
+
+  @@unique([PostId, CategoryId])
+  @@id([PostId, CategoryId])
+}
+
+enum Role {
+  USER
+  ADMIN
+}
