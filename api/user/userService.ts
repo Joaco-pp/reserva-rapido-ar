@@ -37,7 +37,8 @@ export async function getUserById( Id: string ) {
 }
 
 export function registerUser(){
-    return 1 + 1 
+ 
+
 }
 
 
