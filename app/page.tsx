@@ -1,6 +1,5 @@
 import { post } from "@/lib/types"
 import { randomUUID } from "crypto"
-import Link from "next/link"
 
 // Generate array of post mock data
 const posts: post[] = [
@@ -21,6 +20,7 @@ const posts: post[] = [
 
 
 export default function Home() {
+
   return (
     <section>
       {posts.map((post) => {

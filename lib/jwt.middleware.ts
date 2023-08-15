@@ -7,7 +7,7 @@ const accessTokenExpiresIn = env.JWT_ACCESS_TOKEN_EXPIRES_IN;
 const accessToken = env.JWT_ACCESS_TOKEN;
 
 export default function jwtMiddleware() {
-  //check if token exists
+  //Check if token exists
   const token = cookies.call(accessToken).toString();
 
   // if (!token) {

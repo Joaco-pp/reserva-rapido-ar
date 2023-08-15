@@ -1,5 +1,5 @@
 import prismaClient from '../../lib/prisma';
-import { type userParams } from './user';
+import { type userParams, createUserParams } from './user';
 import { User } from '@prisma/client';
 
 export async function getAllUsers(params: userParams) {
@@ -34,6 +34,11 @@ export async function getUserById( Id: string ) {
         throw new Error("Error al obtener el usuario");
     }
 }
+
+export async function login({password, user}: createUserParams){
+
+}
+
 
 export async function createUser( data: User ) {}
 
