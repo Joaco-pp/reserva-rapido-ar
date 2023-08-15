@@ -1,10 +1,11 @@
 'use client'
-import { useState, useEffect, useRef, FormHTMLAttributes } from 'react';
+import { useState, useEffect, useRef, FormEvent } from 'react';
 import {HandleChangeInterface} from "@/lib/types"
 import { USER_REGEX, EMAIL_REGEX, PASS_REGEX, NAME_REGEX} from '@/api/user/regex';
 import Link from 'next/link'
 import CustomInput from "@/components/inputs"
-import {registerUser} from '../../../api/user/userService'
+import {registerUser} from '@/api/user/userService'
+import { userRegister } from '@/api/user/user';
 
 
 export default function RegisterForm(){
@@ -22,16 +23,30 @@ export default function RegisterForm(){
       [evt.target.name]: value
     });
   }
-  const form = document.querySelector('#form') as HTMLFormElement
 
-  async function handleSubmit(evt:React.FormEvent<HTMLFormElement>){
+  async function handleSubmit(evt: FormEvent<HTMLFormElement>){
     evt.preventDefault()
-    const newFormData = new FormData(form);
-    const formValues = Object.fromEntries(newFormData.entries())
+    const newFormData = new FormData(evt.target as HTMLFormElement);
+    // Se declara un objeto con las keys que se van a usar
+    const result: userRegister = {
+      name: "",
+      lastname: "",
+      username: "",
+      password: "",
+      matchPassword: "",
+      email: "",
+      matchEmail: ""
+    };
+    
+    // Se recorre el FormData y se asigna a result los valores que coincidan con las keys de result
+    for(const[key, value] of newFormData.entries())
+    {
+      if(key in result)
+        result[key as keyof userRegister ] = value as string;
+    }
+   
+    await registerUser(result)
     setSuccess(true)
-     
-
-    console.log(formValues)
   }
 
   //inputs y validaciones
@@ -80,14 +95,11 @@ export default function RegisterForm(){
     const result2 = NAME_REGEX.test(inputState.lastname);
     setValidName(result)
     setValidLastname(result2)
-    console.log(`nombre: ${result}, apellido ${result2}`)
   }, [inputState.name, inputState.lastname])
 
   useEffect(()=>{
     const result = USER_REGEX.test(inputState.username);
     setValiUserName(result)  
-    console.log(`usuario: ${result}`)
-
   }, [inputState.username])
 
   useEffect(()=>{
@@ -95,28 +107,24 @@ export default function RegisterForm(){
       setValidPwd(result)
       const match = inputState.password === inputState.matchPassword;
       setValidPwdMatch(match);
-    console.log(`pass: ${result}, matchpass ${match}`)
-
     }, [inputState.password, inputState.matchPassword])
 
     useEffect(()=>{
       const result = EMAIL_REGEX.test(inputState.email);
-      setValidPwd(result)
+      setValidEmail(result)
       const match = inputState.email === inputState.matchEmail;
       setValidEmailMatch(match);
-    console.log(`email: ${result}, matchemail ${match}`)
-
     }, [inputState.email, inputState.matchEmail])
 
     useEffect(()=>{
       setErrMsg('')
     },[inputState.username, inputState.password, inputState.matchPassword,inputState.email,inputState.matchEmail])
-
+    
     useEffect(()=>{
-      const valid = !validEmail && !validName && !validEmailMatch && !validLastname && !validPwd && !validPwdMatch && !validUserName
+      const arrayValid: Boolean[] = [validName, validLastname, validUserName, validPwd, validPwdMatch, validEmail, validEmailMatch]
+      const valid = arrayValid.every((item)=> item === true)
       setValidInput(valid)
-      console.log(`es valido? ${validInput}`)
-    }
+    }, [validName, validLastname, validUserName, validPwd, validPwdMatch, validEmail, validEmailMatch]
     )
     
   
@@ -147,7 +155,7 @@ export default function RegisterForm(){
 
           <CustomInput type="password" label="Confirme contraseña" id="matchPassword" handle={handleInputChange} focus={setPwdMatchFocus}/>
 
-          <button  id="formSubmit" className='px-10 py-3 bg-indigo-700 text-gray-100 text disabled:opacity-50'>Registrarse</button>
+          <button  id="formSubmit" className='px-10 py-3 bg-indigo-700 text-gray-100 text disabled:opacity-50' disabled={!validInput} >Registrarse</button>
 
           <span className="warning" id="warning"></span>
           <Link href="#" className="text-center hover:text-indigo-600 hover:underline focus:text-indigo-900 focus:underline">¿Ya tenés una cuenta? Inicia sesión</Link>

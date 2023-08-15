@@ -1,6 +1,5 @@
-import exp from 'constants';
 import prismaClient from '../../lib/prisma';
-import { type userParams } from './user';
+import { userRegister, type userParams } from './user';
 import { User } from '@prisma/client';
 
 export async function getAllUsers(params: userParams) {
@@ -36,8 +35,8 @@ export async function getUserById( Id: string ) {
     }
 }
 
-export function registerUser(){
- 
+export async function registerUser(user: userRegister){
+    
 
 }
 
